@@ -1,0 +1,9 @@
+[package]
+name = "patisserie"
+version = "0.1.0"
+authors = ["Beth Rennie <beth@brennie.ca>"]
+edition = "2024"
+description = "A CLI client for pastery.net"
+license = "GPL-3.0"
+
+[dependencies]
