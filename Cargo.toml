@@ -7,3 +7,8 @@ description = "A CLI client for pastery.net"
 license = "GPL-3.0"
 
 [dependencies]
+anyhow = "1.0.97"
+camino = "1.1.9"
+clap = { version = "4.5.31", features = ["derive"] }
+reqwest = { version = "0.12.12", features = ["blocking", "json"] }
+serde = { version = "1.0.218", features = ["derive"] }

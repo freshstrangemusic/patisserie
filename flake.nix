@@ -56,6 +56,9 @@
             (toolchain.override {
               extensions = [ "rust-src" ];
             })
+
+            openssl
+            pkg-config
           ];
         };
       }
