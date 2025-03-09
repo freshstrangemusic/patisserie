@@ -68,6 +68,12 @@ struct Options {
     #[arg(short, long)]
     title: Option<String>,
 
+    /// The number of times the paste can be viewed before expiring.
+    ///
+    /// If not provided, the paste will not have view-based expiration.
+    #[arg(long)]
+    max_views: Option<u32>,
+
     /// The path of the file to upload.
     ///
     /// If not provided, the file will be read from standard input.
@@ -182,6 +188,10 @@ fn main() -> Result<(), anyhow::Error> {
 
         if let Some(title) = title {
             query.append_pair("title", &title);
+        }
+
+        if let Some(max_views) = options.max_views {
+            query.append_pair("max_views", &max_views.to_string());
         }
     }
 

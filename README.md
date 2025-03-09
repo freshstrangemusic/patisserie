@@ -28,13 +28,18 @@ Arguments:
           The language for the paste.
 
           If not provided, patisserie will attempt to guess based on the file
-          extension. You can use the special value "autodetect" to have pastery
+          extension. You can use the special value "autodetect" to have Pastery
           detect the language.
 
   -t, --title <TITLE>
           The title of the paste.
 
           If not provided, the name of the file will be used instead.
+
+      --max-views <MAX_VIEWS>
+          The number of times the paste can be viewed before expiring.
+
+          If not provided, the paste will not have view-based expiration.
 
 Options:
       --api-key <API_KEY>
