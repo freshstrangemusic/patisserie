@@ -22,7 +22,7 @@ use std::fs::File;
 use std::io::{Read, stdin};
 
 use anyhow::{Context, anyhow};
-use camino::Utf8PathBuf;
+use camino::{Utf8Path, Utf8PathBuf};
 use clap::Parser;
 use reqwest::Url;
 use reqwest::blocking::Client;
@@ -61,6 +61,12 @@ struct Options {
     /// detect the language.
     #[arg(short, long = "lang", value_parser = parse_language)]
     language: Option<&'static str>,
+
+    /// The title of the paste.
+    ///
+    /// If not provided, the name of the file will be used instead.
+    #[arg(short, long)]
+    title: Option<String>,
 
     /// The path of the file to upload.
     ///
@@ -157,11 +163,27 @@ fn main() -> Result<(), anyhow::Error> {
         .or_else(|| options.path.as_deref().and_then(guess_language))
         .unwrap_or("autodetect");
 
+    let title = options.title.or_else(|| {
+        options
+            .path
+            .as_deref()
+            .and_then(Utf8Path::file_name)
+            .map(ToOwned::to_owned)
+    });
+
     let mut url = Url::parse(API_URL).unwrap();
-    url.query_pairs_mut()
-        .append_pair("api_key", &api_key)
-        .append_pair("duration", &options.duration.to_string())
-        .append_pair("language", language);
+    {
+        let mut query = url.query_pairs_mut();
+
+        query
+            .append_pair("api_key", &api_key)
+            .append_pair("duration", &options.duration.to_string())
+            .append_pair("language", language);
+
+        if let Some(title) = title {
+            query.append_pair("title", &title);
+        }
+    }
 
     let client = Client::new();
 

@@ -31,6 +31,11 @@ Arguments:
           extension. You can use the special value "autodetect" to have pastery
           detect the language.
 
+  -t, --title <TITLE>
+          The title of the paste.
+
+          If not provided, the name of the file will be used instead.
+
 Options:
       --api-key <API_KEY>
           Your pastery API key.
