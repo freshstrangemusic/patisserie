@@ -150,7 +150,13 @@ fn main() -> Result<(), anyhow::Error> {
     // environment variables in help text.
     let api_key = options
         .api_key
-        .map_or_else(|| env::var(API_KEY_ENV_VAR), Ok)?;
+        .map_or_else(|| env::var(API_KEY_ENV_VAR), Ok)
+        .with_context(|| {
+            format!(
+                "You must specify either --api-key or set the {} environment variable",
+                API_KEY_ENV_VAR
+            )
+        })?;
 
     let mut buffer = String::new();
     if let Some(path) = &options.path {
