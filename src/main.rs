@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+mod language;
+
 use std::env;
 use std::fs::File;
 use std::io::{Read, stdin};
@@ -25,6 +27,8 @@ use clap::Parser;
 use reqwest::Url;
 use reqwest::blocking::Client;
 use serde::Deserialize;
+
+use crate::language::{guess_language, parse_language};
 
 const API_URL: &str = "https://www.pastery.net/api/paste/";
 const API_KEY_ENV_VAR: &str = "PASTERY_API_KEY";
@@ -49,6 +53,14 @@ struct Options {
     /// m(inute), h(our), d(ay), mo(nth), y(ear)
     #[arg(short, long = "duration", default_value = "1d", value_parser = parse_duration)]
     duration: u32,
+
+    /// The language for the paste.
+    ///
+    /// If not provided, patisserie will attempt to guess based on the file
+    /// extension. You can use the special value "autodetect" to have pastery
+    /// detect the language.
+    #[arg(short, long = "lang", value_parser = parse_language)]
+    language: Option<&'static str>,
 
     /// The path of the file to upload.
     ///
@@ -128,11 +140,6 @@ fn main() -> Result<(), anyhow::Error> {
         .api_key
         .map_or_else(|| env::var(API_KEY_ENV_VAR), Ok)?;
 
-    let mut url = Url::parse(API_URL).unwrap();
-    url.query_pairs_mut()
-        .append_pair("api_key", &api_key)
-        .append_pair("duration", &options.duration.to_string());
-
     let mut buffer = String::new();
     if let Some(path) = &options.path {
         File::open(path)
@@ -144,6 +151,17 @@ fn main() -> Result<(), anyhow::Error> {
             .read_to_string(&mut buffer)
             .context("Could not read from stdin")?;
     }
+
+    let language = options
+        .language
+        .or_else(|| options.path.as_deref().and_then(guess_language))
+        .unwrap_or("autodetect");
+
+    let mut url = Url::parse(API_URL).unwrap();
+    url.query_pairs_mut()
+        .append_pair("api_key", &api_key)
+        .append_pair("duration", &options.duration.to_string())
+        .append_pair("language", language);
 
     let client = Client::new();
 

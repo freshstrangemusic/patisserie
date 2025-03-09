@@ -24,6 +24,13 @@ Arguments:
 
           [default: 1d]
 
+  -l, --lang <LANGUAGE>
+          The language for the paste.
+
+          If not provided, patisserie will attempt to guess based on the file
+          extension. You can use the special value "autodetect" to have pastery
+          detect the language.
+
 Options:
       --api-key <API_KEY>
           Your pastery API key.
