@@ -14,6 +14,16 @@ Arguments:
 
           If not provided, the file will be read from standard input.
 
+  -d, --duration <DURATION>
+          The duration that this paste will live for.
+
+          After this time, the paste will be deleted.
+
+          You can specify a period of minutes or a value followed by one of the
+          following units: m(inute), h(our), d(ay), mo(nth), y(ear)
+
+          [default: 1d]
+
 Options:
       --api-key <API_KEY>
           Your pastery API key.

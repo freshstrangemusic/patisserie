@@ -41,10 +41,66 @@ struct Options {
     #[arg(long = "api-key")]
     api_key: Option<String>,
 
+    /// The duration that this paste will live for.
+    ///
+    /// After this time, the paste will be deleted.
+    ///
+    /// You can specify a period of minutes or a value followed by one of the following units:
+    /// m(inute), h(our), d(ay), mo(nth), y(ear)
+    #[arg(short, long = "duration", default_value = "1d", value_parser = parse_duration)]
+    duration: u32,
+
     /// The path of the file to upload.
     ///
     /// If not provided, the file will be read from standard input.
     path: Option<Utf8PathBuf>,
+}
+
+fn parse_duration(s: &str) -> Result<u32, anyhow::Error> {
+    const ONE_MINUTE: u32 = 1;
+    const ONE_HOUR: u32 = 60;
+    const ONE_DAY: u32 = ONE_HOUR * 24;
+    const ONE_WEEK: u32 = ONE_DAY * 7;
+    const ONE_MONTH: u32 = ONE_DAY * 30;
+    const ONE_YEAR: u32 = ONE_DAY * 365;
+    const ONE_HUNDRED_YEARS: u32 = ONE_YEAR * 100;
+
+    fn too_long(s: &str) -> anyhow::Error {
+        anyhow!("Duration `{}' is too long; maximum duration is 100y", s)
+    }
+
+    let (amount, unit) = s
+        .find(|c: char| !c.is_ascii_digit())
+        .map(|idx| s.split_at(idx))
+        .unwrap_or_else(|| (s, "m"));
+
+    let amount: u32 = amount.parse().expect("amount is entirely ascii digits");
+
+    let scale = match unit {
+        "m" => ONE_MINUTE,
+        "h" => ONE_HOUR,
+        "d" => ONE_DAY,
+        "w" => ONE_WEEK,
+        "mo" => ONE_MONTH,
+        "y" => ONE_YEAR,
+        _ => {
+            return Err(anyhow!(
+                "Unknown unit `{}'; expected one of `m', `h', `d', `w', `mo', or `y'",
+                unit
+            ));
+        }
+    };
+
+    amount
+        .checked_mul(scale)
+        .ok_or_else(|| too_long(s))
+        .and_then(|t| {
+            if t > ONE_HUNDRED_YEARS {
+                Err(too_long(s))
+            } else {
+                Ok(t)
+            }
+        })
 }
 
 #[derive(Deserialize)]
@@ -73,7 +129,9 @@ fn main() -> Result<(), anyhow::Error> {
         .map_or_else(|| env::var(API_KEY_ENV_VAR), Ok)?;
 
     let mut url = Url::parse(API_URL).unwrap();
-    url.query_pairs_mut().append_pair("api_key", &api_key);
+    url.query_pairs_mut()
+        .append_pair("api_key", &api_key)
+        .append_pair("duration", &options.duration.to_string());
 
     let mut buffer = String::new();
     if let Some(path) = &options.path {
