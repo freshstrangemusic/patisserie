@@ -2,9 +2,17 @@
   description = "patisserie flake";
 
   inputs = {
-    naersk.url = "github:nix-community/naersk";
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
-    rust-overlay.url = "github:oxalica/rust-overlay";
+
+    naersk = {
+      url = "github:nix-community/naersk";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
