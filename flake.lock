@@ -40,7 +40,8 @@
       "inputs": {
         "naersk": "naersk",
         "nixpkgs": "nixpkgs",
-        "rust-overlay": "rust-overlay"
+        "rust-overlay": "rust-overlay",
+        "snowflake": "snowflake"
       }
     },
     "rust-overlay": {
@@ -60,6 +61,42 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "snowflake": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1754771909,
+        "narHash": "sha256-QgXuVl36euvVs43Cu7ymOnK2f6Zo0cGJAr6iS2tAPik=",
+        "owner": "freshstrangemusic",
+        "repo": "snowflake",
+        "rev": "211080a962a57436cdf207338d5846dbdb1fb2ff",
+        "type": "github"
+      },
+      "original": {
+        "owner": "freshstrangemusic",
+        "repo": "snowflake",
+        "type": "github"
+      }
+    },
+    "systems": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
         "type": "github"
       }
     }
