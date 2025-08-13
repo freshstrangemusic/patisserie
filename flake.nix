@@ -40,12 +40,11 @@
             cargo = toolchain;
             rustc = toolchain;
           };
-        in
-        {
-          defaultPackage.${system} = naersk-lib.buildPackage {
+          package = naersk-lib.buildPackage {
             src = ./.;
           };
-
+        in
+        {
           devShells.${system}.default = pkgs.mkShell {
             nativeBuildInputs = with pkgs; [
               (toolchain.override {
@@ -56,6 +55,12 @@
               pkg-config
             ];
           };
+
+          overlays.${system}.default = final: prev: {
+            patisserie = package;
+          };
+
+          packages.${system}.default = package;
         }
       );
 }
